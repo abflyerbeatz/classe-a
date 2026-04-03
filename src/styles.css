@@ -1,9 +1,10 @@
-@import url("https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Space+Grotesk:wght@500;700&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600;700&family=Great+Vibes&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap");
 @import "tailwindcss";
 
 @theme {
-  --font-sans: "Manrope", ui-sans-serif, system-ui, sans-serif;
-  --font-display: "Space Grotesk", ui-sans-serif, system-ui, sans-serif;
+  --font-sans: "Plus Jakarta Sans", ui-sans-serif, system-ui, sans-serif;
+  --font-display: "Cormorant Garamond", serif;
+  --font-logo: "Great Vibes", cursive;
 }
 
 @layer base {
@@ -12,20 +13,26 @@
   }
 
   html {
-    @apply bg-slate-950;
+    @apply bg-[#120d0a];
   }
 
   body {
-    @apply min-h-screen bg-slate-950 text-slate-50 antialiased;
+    @apply min-h-screen bg-[#120d0a] text-stone-50 antialiased;
     background-image:
-      radial-gradient(circle at top left, rgba(52, 211, 153, 0.16), transparent 26%),
-      radial-gradient(circle at top right, rgba(125, 211, 252, 0.16), transparent 24%),
-      linear-gradient(180deg, #06131a 0%, #081018 45%, #030712 100%);
+      radial-gradient(circle at top left, rgba(214, 177, 120, 0.18), transparent 28%),
+      radial-gradient(circle at top right, rgba(255, 244, 227, 0.08), transparent 22%),
+      radial-gradient(circle at bottom right, rgba(122, 92, 63, 0.14), transparent 24%),
+      linear-gradient(180deg, #231814 0%, #130e0c 45%, #080706 100%);
   }
 
   button,
   input {
     @apply font-sans;
+  }
+
+  ::selection {
+    background: rgba(224, 187, 130, 0.38);
+    color: #120d0a;
   }
 
   #root {

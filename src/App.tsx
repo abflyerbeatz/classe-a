@@ -77,6 +77,46 @@ function Field({
   );
 }
 
+function BrandLogo({
+  tone = "light",
+  size = "md",
+  className = "",
+}: {
+  tone?: "light" | "dark";
+  size?: "sm" | "md" | "lg";
+  className?: string;
+}) {
+  const textTone = tone === "dark" ? "text-slate-950" : "text-white";
+  const sparkleTone = tone === "dark" ? "text-slate-950/80" : "text-emerald-200";
+  const underlineTone = tone === "dark" ? "bg-slate-950/80" : "bg-white/70";
+  const sizeClass =
+    size === "lg"
+      ? "text-7xl sm:text-8xl"
+      : size === "sm"
+        ? "text-4xl sm:text-5xl"
+        : "text-5xl sm:text-6xl";
+
+  return (
+    <div className={`relative inline-flex ${className}`}>
+      <div className="relative">
+        <span className={`font-logo ${sizeClass} leading-none ${textTone}`}>
+          Classe A
+        </span>
+        <span
+          className={`absolute -right-5 top-1 text-xl sm:text-2xl ${sparkleTone}`}
+          aria-hidden="true"
+        >
+          ✦
+        </span>
+        <span
+          className={`absolute -bottom-2 left-6 h-[3px] w-[92%] rounded-full ${underlineTone} opacity-80 sm:-bottom-3`}
+          aria-hidden="true"
+        />
+      </div>
+    </div>
+  );
+}
+
 export default function App() {
   const [authMode, setAuthMode] = useState<AuthMode>("login");
   const [isAuthenticated, setIsAuthenticated] = useState(false);
@@ -106,16 +146,11 @@ export default function App() {
 
         <div className="relative mx-auto grid min-h-[calc(100vh-4rem)] max-w-6xl items-center gap-6 lg:grid-cols-[1.1fr_0.9fr]">
           <section className="rounded-[2rem] border border-white/10 bg-white/5 p-6 shadow-[0_30px_100px_rgba(2,12,27,0.45)] backdrop-blur xl:p-10">
-            <div className="mb-10 flex items-center gap-3">
-              <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-emerald-300/18 text-lg font-bold text-emerald-200">
-                C
+            <div className="mb-10 flex flex-col gap-3">
+              <div className="inline-flex w-fit rounded-[1.75rem] bg-white px-5 py-4 shadow-[0_12px_40px_rgba(255,255,255,0.12)]">
+                <BrandLogo size="sm" tone="dark" />
               </div>
-              <div>
-                <p className="font-display text-xl tracking-wide text-white">
-                  CLASSE A
-                </p>
-                <p className="text-sm text-slate-400">Bac Bo Predictor</p>
-              </div>
+              <p className="text-sm text-slate-400">Bac Bo Predictor</p>
             </div>
 
             <div className="space-y-5">
@@ -228,15 +263,10 @@ export default function App() {
       <div className="mx-auto max-w-7xl">
         <header className="mb-6 flex flex-col gap-4 rounded-[2rem] border border-white/10 bg-white/5 p-5 shadow-[0_24px_100px_rgba(0,0,0,0.35)] backdrop-blur md:flex-row md:items-center md:justify-between">
           <div className="flex items-center gap-4">
-            <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-emerald-300/18 text-lg font-bold text-emerald-200">
-              C
+            <div className="rounded-[1.5rem] bg-white px-4 py-3 shadow-[0_12px_40px_rgba(255,255,255,0.08)]">
+              <BrandLogo size="sm" tone="dark" />
             </div>
-            <div>
-              <p className="font-display text-2xl text-white">CLASSE A</p>
-              <p className="text-sm text-slate-400">
-                Painel automatico para Bac Bo
-              </p>
-            </div>
+            <p className="text-sm text-slate-400">Painel automatico para Bac Bo</p>
           </div>
 
           <div className="flex flex-wrap items-center gap-3">
@@ -281,8 +311,11 @@ export default function App() {
             <div
               className={`rounded-[2rem] border border-white/10 bg-gradient-to-br ${toneMap[activeSignal.side]} p-6`}
             >
-              <div className="flex flex-wrap items-center justify-between gap-4">
+              <div className="flex flex-wrap items-start justify-between gap-4">
                 <div>
+                  <div className="mb-3 opacity-85">
+                    <BrandLogo size="sm" />
+                  </div>
                   <p className="text-xs uppercase tracking-[0.28em] text-slate-200/70">
                     {activeSignal.label}
                   </p>
