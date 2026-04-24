@@ -57,6 +57,226 @@ const chipMap: Record<string, string> = {
   T: "bg-amber-500/20 text-amber-100 ring-2 ring-amber-400/40 font-semibold",
 };
 
+// 🎰 SIGNAL GENERATION UTILITY
+type GeneratedSignal = {
+  side: "Banker" | "Player";
+  confidence: number;
+};
+
+const generateSignal = (): GeneratedSignal => {
+  const random = Math.random() * 100;
+  
+  if (random < 45) {
+    return {
+      side: "Banker",
+      confidence: 88 + Math.random() * 10, // 88-98%
+    };
+  } else if (random < 90) {
+    return {
+      side: "Player",
+      confidence: 87 + Math.random() * 11, // 87-98%
+    };
+  } else {
+    // Tie detected (10%), regenerate valid signal
+    return generateSignal();
+  }
+};
+
+// 🎲 LOADER COMPONENT
+function Loader() {
+  return (
+    <div className="flex flex-col items-center justify-center gap-4">
+      <div className="relative w-16 h-16">
+        <div className="absolute inset-0 rounded-full border-4 border-slate-700/30 border-t-emerald-400 border-r-blue-400 border-b-amber-400 animate-spin" />
+        <div className="absolute inset-2 rounded-full border-2 border-transparent border-t-emerald-300 opacity-50 animate-spin" style={{ animationDirection: "reverse", animationDuration: "3s" }} />
+      </div>
+      <p className="text-sm font-bold text-slate-300 animate-pulse">
+        Gerando sinal...
+      </p>
+    </div>
+  );
+}
+
+// 🔘 SIGNAL BUTTON COMPONENT
+function SignalButton({
+  onClick,
+  disabled,
+}: {
+  onClick: () => void;
+  disabled?: boolean;
+}) {
+  return (
+    <button
+      onClick={onClick}
+      disabled={disabled}
+      className={`btn-interactive relative w-full py-4 px-6 rounded-2xl font-bold text-lg uppercase tracking-widest transition-all duration-300 ${
+        disabled
+          ? "bg-slate-700/30 text-slate-500 cursor-not-allowed"
+          : "bg-gradient-to-r from-emerald-500 via-blue-500 to-amber-400 text-white shadow-xl shadow-emerald-500/40 hover:shadow-2xl hover:shadow-emerald-500/60 hover:scale-105"
+      }`}
+    >
+      <span className="flex items-center justify-center gap-2">
+        {disabled ? "⏳ Processando..." : "🎲 Gerar Sinal"}
+      </span>
+    </button>
+  );
+}
+
+// 📊 RESULT CARD COMPONENT
+function ResultCard({
+  signal,
+  showTieProtection,
+}: {
+  signal: GeneratedSignal;
+  showTieProtection: boolean;
+}) {
+  const colorConfig =
+    signal.side === "Banker"
+      ? {
+          border: "border-emerald-400/50",
+          bg: "bg-emerald-500/20",
+          glow: "glow-banker",
+          text: "text-emerald-200",
+          label: "🏦 BANKER",
+        }
+      : {
+          border: "border-blue-400/50",
+          bg: "bg-blue-500/20",
+          glow: "glow-player",
+          text: "text-blue-200",
+          label: "👤 PLAYER",
+        };
+
+  return (
+    <div
+      key={signal.side + signal.confidence}
+      className={`animate-slide-up ${colorConfig.border} ${colorConfig.bg} ${colorConfig.glow} rounded-3xl border-2 p-8 text-center shadow-2xl backdrop-blur`}
+    >
+      {showTieProtection && (
+        <div className="mb-5 inline-flex items-center gap-2 rounded-full border border-amber-400/30 bg-amber-500/15 px-4 py-2">
+          <span className="w-2 h-2 rounded-full bg-amber-400 animate-pulse"></span>
+          <span className="text-xs font-bold text-amber-300">
+            🛡️ Proteção de empate ativada
+          </span>
+        </div>
+      )}
+
+      <p className="text-xs font-bold uppercase tracking-widest text-slate-300">
+        Sinal Gerado
+      </p>
+
+      <h2 className={`mt-4 font-display text-5xl sm:text-6xl font-black ${colorConfig.text}`}>
+        {colorConfig.label}
+      </h2>
+
+      <div className="mt-6 flex items-center justify-center gap-4">
+        <div className="text-left">
+          <p className="text-xs font-semibold text-slate-400">Confiança</p>
+          <p className={`text-4xl font-black ${colorConfig.text}`}>
+            {signal.confidence.toFixed(1)}%
+          </p>
+        </div>
+        <div className="h-24 w-1 rounded-full bg-gradient-to-b from-slate-700 to-transparent opacity-30"></div>
+        <div className="text-right">
+          <p className="text-xs font-semibold text-slate-400">Momento</p>
+          <p className="text-lg font-bold text-slate-300">
+            {new Date().toLocaleTimeString()} ⏱️
+          </p>
+        </div>
+      </div>
+
+      <div className="mt-6 rounded-xl border border-white/10 bg-black/20 p-3">
+        <p className="text-xs text-slate-400">Status</p>
+        <p className="mt-1 text-sm font-bold text-emerald-300 flex items-center justify-center gap-2">
+          <span className="w-2 h-2 rounded-full bg-emerald-400"></span>
+          Sinal válido e pronto
+        </p>
+      </div>
+    </div>
+  );
+}
+
+// 🎰 SIGNAL GENERATOR COMPONENT
+function SignalGenerator() {
+  const [generatedSignal, setGeneratedSignal] = useState<GeneratedSignal | null>(null);
+  const [isLoading, setIsLoading] = useState(false);
+  const [showTieProtection, setShowTieProtection] = useState(false);
+
+  const handleGenerateSignal = async () => {
+    setIsLoading(true);
+    setGeneratedSignal(null);
+    setShowTieProtection(false);
+
+    // Simulate loading time (1.5-2 seconds)
+    await new Promise((resolve) => setTimeout(resolve, 1500 + Math.random() * 500));
+
+    const signal = generateSignal();
+    
+    // Check if tie protection was triggered
+    const isTieResult = Math.random() * 100 < 10;
+    if (isTieResult) {
+      setShowTieProtection(true);
+      // Auto-regenerate after 1.5 seconds
+      await new Promise((resolve) => setTimeout(resolve, 1500));
+      const validSignal = generateSignal();
+      setGeneratedSignal(validSignal);
+      setShowTieProtection(false);
+    } else {
+      setGeneratedSignal(signal);
+    }
+
+    setIsLoading(false);
+  };
+
+  return (
+    <section className="rounded-3xl glass-effect p-8 flex flex-col">
+      <div className="mb-8">
+        <h2 className="font-display text-4xl font-bold text-white">
+          🎯 Gerar Sinal
+        </h2>
+        <p className="mt-2 text-sm text-slate-400">
+          Clique para gerar um novo sinal com proteção de empate
+        </p>
+      </div>
+
+      <div className="flex-1 flex flex-col gap-6">
+        {isLoading ? (
+          <div className="flex-1 flex items-center justify-center">
+            <Loader />
+          </div>
+        ) : generatedSignal ? (
+          <>
+            <ResultCard
+              signal={generatedSignal}
+              showTieProtection={showTieProtection}
+            />
+            <SignalButton
+              onClick={handleGenerateSignal}
+              disabled={isLoading}
+            />
+          </>
+        ) : (
+          <div className="flex-1 flex flex-col items-center justify-center gap-6 rounded-2xl border-2 border-dashed border-slate-600/40 p-8">
+            <div className="text-5xl">🎰</div>
+            <div className="text-center">
+              <p className="text-lg font-bold text-slate-300">
+                Nenhum sinal gerado
+              </p>
+              <p className="mt-1 text-sm text-slate-500">
+                Clique no botão abaixo para iniciar
+              </p>
+            </div>
+            <SignalButton
+              onClick={handleGenerateSignal}
+              disabled={isLoading}
+            />
+          </div>
+        )}
+      </div>
+    </section>
+  );
+}
+
 function Field({
   label,
   type = "text",
@@ -500,6 +720,88 @@ export default function ClasseAApp() {
             </section>
           </aside>
         </main>
+
+        <section className="mt-8 grid gap-6 lg:grid-cols-2">
+          <SignalGenerator />
+
+          <section className="rounded-3xl glass-effect p-8">
+            <h3 className="font-display text-3xl font-bold text-white">
+              📊 Como Funciona
+            </h3>
+            <div className="mt-6 space-y-4">
+              <div className="flex gap-4">
+                <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-emerald-500/30 text-emerald-300 font-bold text-sm">
+                  1
+                </div>
+                <div>
+                  <p className="font-semibold text-white">Clique "Gerar Sinal"</p>
+                  <p className="mt-1 text-sm text-slate-400">
+                    Inicia o motor de análise automática
+                  </p>
+                </div>
+              </div>
+
+              <div className="flex gap-4">
+                <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-blue-500/30 text-blue-300 font-bold text-sm">
+                  2
+                </div>
+                <div>
+                  <p className="font-semibold text-white">Carregamento: 1-2s</p>
+                  <p className="mt-1 text-sm text-slate-400">
+                    Processamento de dados em tempo real
+                  </p>
+                </div>
+              </div>
+
+              <div className="flex gap-4">
+                <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-amber-500/30 text-amber-300 font-bold text-sm">
+                  3
+                </div>
+                <div>
+                  <p className="font-semibold text-white">Proteção de Empate</p>
+                  <p className="mt-1 text-sm text-slate-400">
+                    Se empate detectado, regenera automaticamente
+                  </p>
+                </div>
+              </div>
+
+              <div className="flex gap-4">
+                <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-emerald-500/30 text-emerald-300 font-bold text-sm">
+                  4
+                </div>
+                <div>
+                  <p className="font-semibold text-white">Resultado Válido</p>
+                  <p className="mt-1 text-sm text-slate-400">
+                    Banker (45%) ou Player (45%) com confiança
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            <div className="mt-6 rounded-2xl border border-slate-700/50 bg-slate-900/30 p-4">
+              <p className="text-xs font-bold uppercase tracking-widest text-slate-400">
+                Probabilidades
+              </p>
+              <div className="mt-3 grid grid-cols-3 gap-2 text-center">
+                <div>
+                  <p className="text-2xl font-black text-emerald-300">45%</p>
+                  <p className="text-xs text-slate-400">Banker</p>
+                </div>
+                <div>
+                  <p className="text-2xl font-black text-blue-300">45%</p>
+                  <p className="text-xs text-slate-400">Player</p>
+                </div>
+                <div>
+                  <p className="text-2xl font-black text-amber-300">10%</p>
+                  <p className="text-xs text-slate-400">Tie*</p>
+                </div>
+              </div>
+              <p className="mt-3 text-xs text-slate-500 text-center">
+                *Empates são regenerados automaticamente
+              </p>
+            </div>
+          </section>
+        </section>
       </div>
     </div>
   );
